@@ -1,0 +1,105 @@
+想让一个类可以进行迭代，需要在其内部实现 `__iter__()` 方法。
+当使用 `for` 循环时，解释器会调用内置的 `iter()` 函数，调用前首先会检查对象是否实现了 `__iter__()` 方法，如果有就调用获得一个迭代器对象，所以 `__iter__()` 方法需要返回一个迭代器对象。
+在这里使用 `yield` 关键字返回一个生成器。
+本题需要返回链表的各个节点，所以需要从头遍历这个链表，`yield` 每个节点的值。
+
+
+
+
+
+# 解法一：
+### 解题思路
+通过阅读 `LinkedList` 类的代码得知：
+`LinkedList` 类中有一个实例属性为 `self.length`。`LinkedList` 类中的 `add()` 方法会在每一次添加节点时，将 `self.length` 加上一，所以链表的长度就为 `self.length` 的值。
+题目要求为：
+对这个类的实例调用 `len()` 方法能够返回这个链表的长度。
+所以我们需要在 `Linkedlist` 类中实现 `__len()__` 方法返回链表的长度即可。
+```
+def __len__(self):
+    return self.length
+```
+- - -
+### 题解代码
+`solution.py`
+```
+[[python]]
+class Node:
+    def __init__(self, val=None, next=None):
+        self.val = val
+        self.next = next
+
+
+class LinkedList:
+    def __init__(self):
+        self.length = 0
+        self.head = None
+        self.tail = None
+
+    def add(self, val):
+        newnode = Node(val)
+        if self.length == 0:
+            self.head = newnode
+            self.tail = self.head
+        else:
+            self.tail.next = newnode
+            self.tail = newnode
+        self.length += 1
+
+    def __iter__(self):
+        cur = self.head
+        while cur:
+            yield cur.val
+            cur = cur.next
+
+    # Please write your code here
+    def __len__(self):
+        return self.length
+```
+# 解法二：
+### 解题思路
+
+
+
+
+# 解法三：
+### 解题思路
+在 `LinkedList` 类内部实现 `__iter__()` 和 `__next__()` 方法，我们就可以将其变成一个迭代器。因为在 `__iter__()` 中需要返回一个迭代器对象，而此时 `LinkedList` 类实例就是一个迭代器，所以我们就返回 `LinkedList` 类实例本身。接下来 `for` 循环就会来调用 `__next__()` 方法，我们在 `__next__()` 方法中返回每个节点的值
+
+---
+### 题解代码
+```
+class Node:
+    def __init__(self, val=None, next=None):
+        self.val = val
+        self.next = next
+
+
+class LinkedList:
+    def __init__(self):
+        self.__length = 0
+        self.head = None
+        self.tail = None
+
+    def add(self, val):
+        newnode = Node(val)
+        if self.__length == 0:
+            self.head = newnode
+            self.tail = self.head
+        else:
+            self.tail.next = newnode
+            self.tail = newnode
+        self.__length += 1
+
+    def __iter__(self):
+        self.cur = self.head
+        return self
+
+    def __next__(self):
+        if not self.cur:
+            raise StopIteration()
+        val = self.cur.val
+        self.cur = self.cur.next
+        return val
+```
+
+---
