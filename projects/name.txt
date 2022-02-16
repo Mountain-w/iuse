@@ -101,5 +101,5 @@ class LinkedList:
         self.cur = self.cur.next
         return val
 ```
-
+test
 ---
