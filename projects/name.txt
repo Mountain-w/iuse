@@ -95,11 +95,11 @@ class LinkedList:
         return self
 
     def __next__(self):
+    # ss
         if not self.cur:
             raise StopIteration()
         val = self.cur.val
         self.cur = self.cur.next
         return val
 ```
-test
 ---
