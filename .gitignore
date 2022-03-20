@@ -2,7 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+*/settings
 # C extensions
 *.so
 
@@ -10,6 +10,7 @@ __pycache__/
 .Python
 */.idea
 .idea
+/iuse/iuse/settings.py
 build/
 develop-eggs/
 dist/
