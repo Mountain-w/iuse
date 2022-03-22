@@ -9,6 +9,7 @@ authenticate as django_authenticate,
 login as django_login,
 logout as django_logout,
 )
+from utils.auth.authhelper import generate_token
 from accounts.api.serializers import UserSerializer, SignupSerializer, LoginSerializer
 
 
@@ -41,11 +42,11 @@ class AccountViewSet(viewsets.ViewSet):
                 "success": False,
                 "message": "username and password does match",
             }, status=400)
-        # django_login(request, user)
         request.user = user
         return Response({
             "success": True,
             "user": UserSerializer(instance=user).data,
+            "token" : generate_token(username)
         })
     @action(methods=["POST"], detail=False)
     def logout(self, request):
@@ -65,13 +66,13 @@ class AccountViewSet(viewsets.ViewSet):
         request.user = user
         return Response({
             'success':True,
-            'user':UserSerializer(user).data
+            'user':UserSerializer(user).data,
+            'token': generate_token(user.username)
                          },
             status=status.HTTP_201_CREATED)
 
     @action(methods=["GET"], detail=False)
     def login_status(self, request):
-        print(type(request.user))
         data = {"has_logged_in": request.user.is_authenticated}
         if request.user.is_authenticated:
             data['user'] = UserSerializer(request.user).data

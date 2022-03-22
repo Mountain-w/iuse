@@ -12,7 +12,7 @@ class Source(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     parent_dir = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, default=None)
     on_delete = models.CharField(max_length=1, choices=DeleteStatus.choices, default=DeleteStatus.exists)
-    deleted_at = models.DateTimeField(auto_now=True)
+    update_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         index_together = (('name', 'created_at'),)
