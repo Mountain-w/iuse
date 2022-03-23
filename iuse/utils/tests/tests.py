@@ -2,12 +2,13 @@ import time
 from unittest import TestCase
 import base64
 from utils.auth.authhelper import (
-checkout_token,
-generate_token,
-generate_token_for_test,
-get_user_for_test,
+    checkout_token,
+    generate_token,
+    generate_token_for_test,
+    get_user_for_test,
 )
 from utils.exceptions.exceptions import TokenInvalid, TokenOutDate
+
 
 class UtilsTest(TestCase):
     def test_generate_checkout(self):

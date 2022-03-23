@@ -1,13 +1,26 @@
 from testing.testscases import TestCase
 from rest_framework.test import APIClient
+from accounts.models import UserProfile
+from utils.modelshelpers.enums import FileType
 LOGIN_URL = '/api/accounts/login/'
 LOGOUT_URL = '/api/accounts/logout/'
 SIGNUP_URL = '/api/accounts/signup/'
 LOGIN_STATUS = '/api/accounts/login_status/'
 
+
 class AccountTest(TestCase):
     def setUp(self):
         self.ruize, self.ruize_client = self.create_user_client('ruize')
+
+    def test_profile_property(self):
+        ruize01, _ = self.create_user_client('ruize01')
+        self.assertEqual(UserProfile.objects.count(), 2)
+        p = ruize01.profile
+        self.assertEqual(isinstance(p, UserProfile), True)
+        self.assertEqual(UserProfile.objects.count(), 2)
+        self.assertEqual(p.source_path.name, ruize01.username)
+        self.assertEqual(p.source_path.type, FileType.DIR)
+        self.assertEqual(p.source_path.owner.id, ruize01.id)
 
     def test_login(self):
         data = {}
@@ -35,7 +48,9 @@ class AccountTest(TestCase):
         response = client.post(LOGIN_URL, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['user']['id'], self.ruize.id)
-
+        client.credentials(HTTP_AUTHORIZATION=response.data['token'])
+        response = client.get(LOGIN_STATUS)
+        self.assertEqual(response.data['has_logged_in'], True)
 
     def test_logout(self):
         # 测试get方法无效
@@ -53,9 +68,11 @@ class AccountTest(TestCase):
         data['username'] = self.ruize.username
         data['password'] = 'correct password'
         client = APIClient()
-        client.post(LOGIN_URL, data)
+        response = client.post(LOGIN_URL, data)
+        client.credentials(HTTP_AUTHORIZATION=response.data['token'])
         response = client.post(LOGOUT_URL)
         self.assertEqual(response.status_code, 200)
+        client.credentials()
         response = client.get(LOGIN_STATUS)
         self.assertEqual(response.data['has_logged_in'], False)
 
@@ -111,7 +128,7 @@ class AccountTest(TestCase):
         client = APIClient()
         response = client.post(SIGNUP_URL, data)
         self.assertEqual(response.status_code, 201)
+        client.credentials(HTTP_AUTHORIZATION=response.data['token'])
         response = client.get(LOGIN_STATUS)
         self.assertEqual(response.data['has_logged_in'], True)
         self.assertEqual(response.data['user']['username'], data['username'])
-

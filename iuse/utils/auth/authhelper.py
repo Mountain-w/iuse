@@ -9,6 +9,7 @@ from iuse.settings import BASE_DIR
 
 file_path = os.path.join(BASE_DIR, 'keys')
 
+
 def load_keys():
     with open(file_path + '/public.pem', 'rb') as f:
         public_key = rsa.PublicKey.load_pkcs1(f.read())
@@ -18,6 +19,7 @@ def load_keys():
 
     return public_key, private_key
 
+
 def generate_token(username, expire=5):
     public_key, _ = load_keys()
     time = str(datetime.now().date())
@@ -25,12 +27,14 @@ def generate_token(username, expire=5):
     token = rsa.encrypt(playload, public_key)
     return base64.encodebytes(token).decode('utf-8').replace('\n', '')
 
+
 def generate_token_for_test(username, expire=5):
     public_key, _ = load_keys()
     time = str(datetime.now().date())
     playload = ':'.join((username, time, str(expire))).encode('utf-8')
     token = rsa.encrypt(playload, public_key)
     return base64.encodebytes(token).decode('utf-8')
+
 
 def checkout_token(token):
     _, private_key = load_keys()
@@ -51,7 +55,6 @@ def checkout_date(date, outdate):
     if (now - date).days > int(outdate):
         return False
     return True
-
 
 
 def get_user(token):

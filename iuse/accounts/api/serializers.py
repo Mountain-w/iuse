@@ -36,8 +36,10 @@ class SignupSerializer(LoginSerializer):
         username = validated_data['username']
         password = validated_data['password']
         email = validated_data['email']
-        return User.objects.create_user(
+        user = User.objects.create_user(
             username=username,
             password=password,
             email=email
         )
+        user.profile
+        return user
