@@ -23,10 +23,12 @@ class UtilsTest(TestCase):
         try:
             checkout_token(token1)
         except TokenInvalid as e:
-            print(e)
+            # print(e)
+            pass
         # 超时 token
         token = generate_token_for_test(username, 9)
         try:
             checkout_token(token)
         except TokenOutDate as e:
-            print(e)
+            # print(e)
+            pass

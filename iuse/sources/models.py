@@ -18,6 +18,10 @@ class Source(models.Model):
         index_together = (('parent_dir_id', 'name'),)
         ordering = ('created_at', 'name')
 
+    @property
+    def children(self):
+        return Source.objects.filter(parent_dir=self).all()
+
     def __str__(self):
         return f'owner:{self.owner}, {self.parent_dir}/{self.name}'
 

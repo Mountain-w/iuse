@@ -4,6 +4,9 @@ from rest_framework.test import APIClient
 from utils.auth.authhelper import generate_token
 from sources.models import Source
 from utils.modelshelpers.enums import FileType
+from sources.SourceServer import SourceServer
+import os
+from iuse.settings import TEST_BASE_DIR
 
 class TestCase(django_TestCase):
     @property
@@ -27,10 +30,16 @@ class TestCase(django_TestCase):
         token = generate_token(user.username)
         client.credentials(HTTP_AUTHORIZATION=token)
         user.profile
+        SourceServer.create_sources_for_test(user.profile.source_path)
         return user, client
 
-    def create_source_dir(self, parent_id, name):
-        return Source.objects.create(parent_dir_id=parent_id, name=name, type=FileType.DIR)
+    def create_source_dir(self, parent, name):
+        return Source.objects.create(parent_dir_id=parent.id, name=name, type=FileType.DIR, owner=parent.owner)
 
-    def create_source_file(self, parent_id, name):
-        return Source.objects.create(parent_dir_id=parent_id, name=name, type=FileType.FILE)
+    def create_source_file(self, parent, name):
+        return Source.objects.create(parent_dir_id=parent.id, name=name, type=FileType.FILE, owner=parent.owner)
+
+    def exists(self, source):
+        path = SourceServer.generate_path(source)
+        path = os.path.join(TEST_BASE_DIR, path)
+        return os.path.exists(path)

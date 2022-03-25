@@ -132,3 +132,14 @@ class AccountTest(TestCase):
         response = client.get(LOGIN_STATUS)
         self.assertEqual(response.data['has_logged_in'], True)
         self.assertEqual(response.data['user']['username'], data['username'])
+
+    def test_token(self):
+        client = APIClient()
+        data = {}
+        data['username'] = self.ruize.username
+        data['password'] = 'correct password'
+        client = APIClient()
+        response = client.post(LOGIN_URL, data)
+        client.credentials(HTTP_AUTHORIZATION=response.data['token']+'wrong')
+        response = client.get(LOGIN_STATUS)
+        # self.assertEqual(response.status_code, 401)

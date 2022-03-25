@@ -23,10 +23,14 @@ def check_token(auth_head=None):
 
 class AuthMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        pass
+        setattr(request, '_dont_enforce_csrf_checks', True)
 
     def process_view(self, request, func, *args, **kwargs):
         auth_head = request.META.get('HTTP_AUTHORIZATION')
 
         if auth_head:
             request.user = check_token(auth_head)
+
+    def process_response(self, request, response, *args, **kwargs):
+        # print(response.__dict__)
+        return response

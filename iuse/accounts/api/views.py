@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.middleware.csrf import get_token
 from rest_framework import viewsets, status
 from rest_framework.permissions import AllowAny
 from rest_framework import permissions
@@ -46,7 +47,8 @@ class AccountViewSet(viewsets.ViewSet):
         return Response({
             "success": True,
             "user": UserSerializer(instance=user).data,
-            "token" : generate_token(username)
+            "token" : generate_token(username),
+            "crsf": get_token(request)
         })
     @action(methods=["POST"], detail=False)
     def logout(self, request):
@@ -67,7 +69,8 @@ class AccountViewSet(viewsets.ViewSet):
         return Response({
             'success':True,
             'user':UserSerializer(user).data,
-            'token': generate_token(user.username)
+            'token': generate_token(user.username),
+            'crsf': get_token(request)
                          },
             status=status.HTTP_201_CREATED)
 

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework.exceptions import ValidationError
+from sources.SourceServer import SourceServer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -12,6 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=20, min_length=4)
     password = serializers.CharField(min_length=6, max_length=20)
+
     class Meta:
         model = User
         fields = ('username', "password")
@@ -27,9 +29,9 @@ class SignupSerializer(LoginSerializer):
     def validate(self, data):
         username = data['username']
         if User.objects.filter(username=username).exists():
-            raise ValidationError({"message" :"User is already exists"})
+            raise ValidationError({"message": "User is already exists"})
         if User.objects.filter(email=data['email'].lower()).exists():
-            raise ValidationError({"message":"The email has been registered"})
+            raise ValidationError({"message": "The email has been registered"})
         return data
 
     def create(self, validated_data):
@@ -42,4 +44,5 @@ class SignupSerializer(LoginSerializer):
             email=email
         )
         user.profile
+        SourceServer.create_sources(user.profile.source_path)
         return user

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from sources.models import Source
 from utils.modelshelpers.enums import FileType
+from sources.SourceServer import SourceServer
 # Create your models here.
 
 
@@ -23,10 +24,17 @@ def get_profile(user):
     if UserProfile.objects.filter(user=user).exists():
         profile = UserProfile.objects.get(user=user)
     else:
-        source_path = Source.objects.create(name=user.username, type=FileType.DIR, owner=user)
-        profile = UserProfile.objects.create(user=user, source_path=source_path)
+        profile = create_profile_and_dir(user)
     setattr(user, '_cached_user_profile', profile)
     return profile
+
+
+def create_profile_and_dir(user):
+    """
+    创建用户时初始化用户文件夹
+    """
+    source_path = Source.objects.create(name=user.username, type=FileType.DIR, owner=user)
+    return UserProfile.objects.create(user=user, source_path=source_path)
 
 
 User.profile = property(get_profile)

@@ -30,12 +30,13 @@ def generate_token(username, expire=5):
 
 def generate_token_for_test(username, expire=5):
     public_key, _ = load_keys()
-    time = str(datetime.now().date())
+    time = str(datetime.now().date() - timedelta(days=20))
     playload = ':'.join((username, time, str(expire))).encode('utf-8')
     token = rsa.encrypt(playload, public_key)
     return base64.encodebytes(token).decode('utf-8')
 
 
+# TODO
 def checkout_token(token):
     _, private_key = load_keys()
     try:
