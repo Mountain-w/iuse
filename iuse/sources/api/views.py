@@ -78,6 +78,7 @@ class SourceViewSet(viewsets.GenericViewSet):
 
     @action(methods=['POST'], detail=True, permission_classes=(IsAuthenticated, IsSourceOwner))
     def download(self, request, pk):
+        self.get_object()
         serializer = SourceDownloadSerializer(data=request.data, context={'pk': pk})
         if not serializer.is_valid():
             return Response({
