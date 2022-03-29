@@ -19,10 +19,12 @@ from rest_framework import routers
 from accounts.api.views import AccountViewSet
 from accounts.api.views import UserViewSet
 from sources.api.views import SourceViewSet
+from recyclebin.api.views import GarbageViewSet
 router = routers.DefaultRouter()
 router.register(r'api/users', UserViewSet, basename='users')
 router.register(r'api/accounts', AccountViewSet, basename='accounts')
 router.register(r'api/sources', SourceViewSet, basename='sources')
+router.register(r'api/recyclebin', GarbageViewSet, basename='recyclebin')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

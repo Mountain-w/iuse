@@ -2,6 +2,8 @@ from django.middleware.csrf import get_token
 from rest_framework import viewsets, status
 from django.http.response import StreamingHttpResponse
 from django.contrib.auth.models import User
+
+from recyclebin.models import Garbage
 from sources.models import Source
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
@@ -9,11 +11,12 @@ from sources.api.serializers import (
     SourceWithChildrenSerializer,
     SourceSerializer,
     SourceCreateDirSerializer,
-    SourceDownloadSerializer
+    SourceDownloadSerializer,
+    SourceDeleteSerializer
 )
 from utils.permissions import IsSourceOwner
 from rest_framework.response import Response
-from utils.modelshelpers.enums import FileType
+from utils.modelshelpers.enums import FileType, DeleteStatus
 from sources.SourceServer import SourceServer
 
 
@@ -33,7 +36,7 @@ class SourceViewSet(viewsets.GenericViewSet):
 
     @action(methods=['POST'], detail=True, permission_classes=(IsAuthenticated, IsSourceOwner))
     def upload(self, request, pk):
-        parent_dir = Source.objects.filter(id=int(pk))
+        parent_dir = self.get_object()
         if not parent_dir:
             return Response({
                 'errors': 'The dir is not exists'
@@ -60,6 +63,7 @@ class SourceViewSet(viewsets.GenericViewSet):
 
     @action(methods=['POST'], detail=True, permission_classes=(IsAuthenticated, IsSourceOwner))
     def create_dir(self, request, pk):
+        self.get_object()
         serializer = SourceCreateDirSerializer(data=request.data, context={'request': request, 'pk': pk})
         if not serializer.is_valid():
             return Response({
@@ -86,3 +90,19 @@ class SourceViewSet(viewsets.GenericViewSet):
         response['Content-Type'] = 'application/octet-stream'
         response['Content-Disposition'] = f'attachment;filename={request.data["name"]}'
         return response
+
+    @action(methods=['POST'], detail=True, permission_classes=(IsAuthenticated, IsSourceOwner))
+    def delete(self, request, pk):
+        instance = self.get_object()
+        serializer = SourceDeleteSerializer(data=request.data, context={'pk': pk})
+        if not serializer.is_valid():
+            return Response({
+                'message': 'Delete error',
+                'errors': serializer.errors,
+            }, status=status.HTTP_400_BAD_REQUEST)
+        instance.on_delete = DeleteStatus.has_deleted
+        Garbage.objects.create(
+            source=instance,
+            owner=instance.owner
+        )
+        return Response({'success': 'ok'}, status=status.HTTP_200_OK)
