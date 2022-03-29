@@ -8,6 +8,8 @@ __pycache__/
 # Distribution / packaging
 .Python
 */.idea
+iuse/iusepan/
+iuse/testpan/
 iuse/iuse/settings.py
 .idea
 build/

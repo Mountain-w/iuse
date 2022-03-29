@@ -5,6 +5,8 @@ from accounts.api.serializers import UserSerializer
 from rest_framework.exceptions import ValidationError
 from utils.modelshelpers.enums import FileType
 from sources.SourceServer import SourceServer
+from utils.modelshelpers.enums import DeleteStatus
+from recyclebin.models import Garbage
 
 
 class SourceSerializer(serializers.ModelSerializer):
@@ -63,10 +65,12 @@ class SourceDownloadSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
     def validate(self, data):
-        print(data)
         source = Source.objects.filter(name=data['name'], parent_dir_id=int(self.context['pk']))
         if not source:
             raise ValidationError('File does exist')
         data['path'] = SourceServer.generate_path(source[0])
         return data
 
+
+class SourceDeleteSerializer(SourceDownloadSerializer):
+    pass

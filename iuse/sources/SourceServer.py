@@ -52,7 +52,6 @@ class SourceServer:
 
     @staticmethod
     def create_dir(path):
-        print(path)
         if os.path.exists(path):
             pass
         else:

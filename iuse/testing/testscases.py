@@ -7,6 +7,7 @@ from utils.modelshelpers.enums import FileType
 from sources.SourceServer import SourceServer
 import os
 from iuse.settings import TEST_BASE_DIR
+from recyclebin.models import Garbage
 
 class TestCase(django_TestCase):
     @property
@@ -43,3 +44,8 @@ class TestCase(django_TestCase):
         path = SourceServer.generate_path(source)
         path = os.path.join(TEST_BASE_DIR, path)
         return os.path.exists(path)
+
+    def create_garbage(self, source):
+        return Garbage.objects.create(
+            source=source,
+        )
