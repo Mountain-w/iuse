@@ -6,13 +6,12 @@ from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.contrib.auth import (
-authenticate as django_authenticate,
-login as django_login,
-logout as django_logout,
+    authenticate as django_authenticate,
+    login as django_login,
+    logout as django_logout,
 )
 from utils.auth.authhelper import generate_token
 from accounts.api.serializers import UserSerializer, SignupSerializer, LoginSerializer
-
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -23,6 +22,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
+
 class AccountViewSet(viewsets.ViewSet):
     permission_classes = (AllowAny,)
     serializer_class = SignupSerializer
@@ -32,7 +32,7 @@ class AccountViewSet(viewsets.ViewSet):
         serializer = LoginSerializer(data=request.data)
         if not serializer.is_valid():
             return Response({
-                'message' : 'please check input',
+                'message': 'please check input',
                 'error': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
         username = serializer.validated_data['username']
@@ -47,13 +47,13 @@ class AccountViewSet(viewsets.ViewSet):
         return Response({
             "success": True,
             "user": UserSerializer(instance=user).data,
-            "token" : generate_token(username),
-            "crsf": get_token(request)
+            "token": generate_token(username),
         })
+
     @action(methods=["POST"], detail=False)
     def logout(self, request):
         django_logout(request)
-        return Response({"success":True}, status=status.HTTP_200_OK)
+        return Response({"success": True}, status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=False)
     def signup(self, request):
@@ -64,14 +64,12 @@ class AccountViewSet(viewsets.ViewSet):
                 'error': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
         user = serializer.save()
-        # django_login(request, user)
         request.user = user
         return Response({
-            'success':True,
-            'user':UserSerializer(user).data,
+            'success': True,
+            'user': UserSerializer(user).data,
             'token': generate_token(user.username),
-            'crsf': get_token(request)
-                         },
+        },
             status=status.HTTP_201_CREATED)
 
     @action(methods=["GET"], detail=False)
