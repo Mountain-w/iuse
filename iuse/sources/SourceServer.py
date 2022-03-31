@@ -65,3 +65,10 @@ class SourceServer:
         except Exception as e:
             return False
         return True
+
+    @classmethod
+    def delete(cls, source):
+        path = os.path.join(FILE_BASE_DIR, cls.generate_path(source))
+        if int(source.type) == FileType.FILE:
+            source.delete()
+            os.remove(path)

@@ -20,8 +20,8 @@ class Source(models.Model):
 
     @property
     def children(self):
-        return Source.objects.filter(parent_dir=self).all()
+        return Source.objects.filter(parent_dir=self, on_delete=DeleteStatus.exists).all()
 
     def __str__(self):
-        return f'owner:{self.owner}, {self.parent_dir}/{self.name}'
+        return f'owner:{self.owner}, {self.parent_dir.name}/{self.name}'
 

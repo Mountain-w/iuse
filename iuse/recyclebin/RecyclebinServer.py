@@ -1,6 +1,8 @@
 from recyclebin.models import Garbage
 from datetime import datetime, timedelta
 from iuse.settings import REST_TIME
+from utils.modelshelpers.enums import DeleteStatus
+from sources.SourceServer import SourceServer
 
 
 class RecyclebinServer:
@@ -20,6 +22,18 @@ class RecyclebinServer:
 
     @classmethod
     def get_rest_minute(cls, garbage):
-        minute = garbage.created_at.minute
-        now = datetime.now().minute
-        return REST_TIME - (now - minute)
+        minute = datetime.now() - garbage.created_at
+        return REST_TIME - minute.seconds//60
+
+    @classmethod
+    def recover(cls, garbage):
+        source = garbage.source
+        source.on_delete = DeleteStatus.exists
+        source.save()
+        garbage.delete()
+
+    @classmethod
+    def recycle(cls, garbage):
+        source = garbage.source
+        SourceServer.delete(source)
+        garbage.delete()

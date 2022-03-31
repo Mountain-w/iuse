@@ -8,11 +8,11 @@ app = Celery('iuse')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 from datetime import datetime, timedelta
 from celery.schedules import crontab
-app.autodiscover_tasks(['recyclebin.deletetest.delete'])
+app.autodiscover_tasks(['recyclebin.Timed_recycling.timed_recycling'])
 app.conf.update(
     CELERYBEAT_SCHEDULE={
         'del_test': {
-            'task': 'recyclebin.deletetest.delete',
+            'task': 'recyclebin.Timed_recycling.timed_recycling',
             'schedule': timedelta(seconds=10),
             'args': (),
         }
