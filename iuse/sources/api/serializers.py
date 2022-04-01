@@ -67,7 +67,7 @@ class SourceDownloadSerializer(serializers.ModelSerializer):
     def validate(self, data):
         source = Source.objects.filter(name=data['name'], parent_dir_id=int(self.context['pk']))
         if not source or int(source[0].on_delete) == DeleteStatus.has_deleted:
-            raise ValidationError('File does exist')
+            raise ValidationError('File does not exist')
         data['path'] = SourceServer.generate_path(source[0])
         data['instance'] = source[0]
         return data
@@ -83,5 +83,9 @@ class SourceUploadSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
     def validate(self, data):
+        pk = self.context['pk']
+        parent = Source.objects.filter(id=int(pk)).all()
+        if not parent:
+            raise ValidationError({'message': 'The dir does not exists'})
         if Source.objects.filter(name=data['name'], parent_dir_id=int(self.context['pk'])).exists():
             raise ValidationError({'message': f'{data["name"]} has exists'})

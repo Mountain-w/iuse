@@ -8,12 +8,19 @@ from sources.SourceServer import SourceServer
 class RecyclebinServer:
 
     @classmethod
-    def get_query_set(cls, user):
-        query_set_ = Garbage.objects.filter(owner=user).all()
+    def get_query_set(cls, user=None):
         query_set = []
-        for query in query_set_:
-            if cls.get_rest_minute(query) > 0:
-                query_set.append(query)
+        if user is not None:
+            query_set_ = Garbage.objects.filter(owner=user).all()
+            for query in query_set_:
+                if cls.get_rest_minute(query) > 0:
+                    query_set.append(query)
+        else:
+            query_set_ = Garbage.objects.all()
+            for query in query_set_:
+                if cls.get_rest_minute(query) > 0:
+                    query_set.append(query.id)
+            query_set = Garbage.objects.filter(id__in=query_set)
         return query_set
 
     @classmethod

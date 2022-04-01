@@ -47,7 +47,6 @@ class SourceViewSet(viewsets.GenericViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
         filename = file.name
         # 检测文件是否存在，是否合法。
-        # TODO
         serializer = SourceUploadSerializer(data={'name': filename}, context={'pk': pk})
         if not serializer.is_valid():
             return Response({

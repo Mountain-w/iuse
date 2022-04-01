@@ -7,6 +7,9 @@ from sources.models import Source
 class SourceServer:
     @classmethod
     def make_full_path(cls, path):
+        """
+        用相对路径组装成文件系统路径。
+        """
         full_path = os.path.join(FILE_BASE_DIR, path)
         return full_path
 
@@ -52,6 +55,9 @@ class SourceServer:
 
     @staticmethod
     def create_dir(path):
+        """
+        根据路径创建文件夹
+        """
         if os.path.exists(path):
             pass
         else:
@@ -59,6 +65,9 @@ class SourceServer:
 
     @staticmethod
     def create_file(path, file):
+        """
+        根据路径创建文件
+        """
         try:
             with open(path, 'wb+') as f:
                 f.write(file)
@@ -68,6 +77,9 @@ class SourceServer:
 
     @classmethod
     def delete(cls, source):
+        """
+        真正的删除操作，接收一个资源，凭借出完整路径后删除文件系统中真正的文件。
+        """
         path = os.path.join(FILE_BASE_DIR, cls.generate_path(source))
         if int(source.type) == FileType.FILE:
             source.delete()
