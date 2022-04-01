@@ -83,4 +83,7 @@ class SourceServer:
         path = os.path.join(FILE_BASE_DIR, cls.generate_path(source))
         if int(source.type) == FileType.FILE:
             source.delete()
-            os.remove(path)
+            try:
+                os.remove(path)
+            except Exception:
+                pass

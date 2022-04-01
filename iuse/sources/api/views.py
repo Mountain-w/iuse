@@ -38,7 +38,11 @@ class SourceViewSet(viewsets.GenericViewSet):
 
     @action(methods=['POST'], detail=True, permission_classes=(IsAuthenticated, IsSourceOwner))
     def upload(self, request, pk):
-        self.get_object()
+        instance = self.get_object()
+        if int(instance.type) != FileType.DIR:
+            return Response({
+                'message': 'you can not upload file to a file'
+            }, status=status.HTTP_400_BAD_REQUEST)
         # 获取文件
         file = request.FILES.get('file', None)
         if not file:

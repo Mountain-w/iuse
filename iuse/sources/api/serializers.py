@@ -36,7 +36,7 @@ class SourceCreateDirSerializer(serializers.ModelSerializer):
     def validate(self, data):
         pk = self.context['pk']
         parent = Source.objects.filter(id=int(pk)).all()
-        if not parent:
+        if not parent or int(parent[0].on_delete) == DeleteStatus.has_deleted:
             raise ValidationError({'message': 'The dir does not exists'})
         if data['name'] in [child.name for child in parent[0].children]:
             raise ValidationError({'message': 'The dir has existed'})
@@ -89,3 +89,4 @@ class SourceUploadSerializer(serializers.ModelSerializer):
             raise ValidationError({'message': 'The dir does not exists'})
         if Source.objects.filter(name=data['name'], parent_dir_id=int(self.context['pk'])).exists():
             raise ValidationError({'message': f'{data["name"]} has exists'})
+        return data

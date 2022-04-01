@@ -13,7 +13,7 @@ app.conf.update(
     CELERYBEAT_SCHEDULE={
         'del_test': {
             'task': 'recyclebin.Timed_recycling.timed_recycling',
-            'schedule': timedelta(seconds=10),
+            'schedule': timedelta(seconds=30),
             'args': (),
         }
     }
