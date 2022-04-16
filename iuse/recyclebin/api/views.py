@@ -12,7 +12,9 @@ from utils.permissions import IsSourceOwner
 class GarbageViewSet(viewsets.GenericViewSet):
     serializer_class = GarbageSerializer
     permission_classes = (IsAuthenticated, IsSourceOwner)
-    queryset = RecyclebinServer.get_query_set()
+
+    def get_queryset(self):
+        return RecyclebinServer.get_query_set()
 
     def list(self, request):
         query_set = RecyclebinServer.get_query_set(request.user)
@@ -27,8 +29,5 @@ class GarbageViewSet(viewsets.GenericViewSet):
         """
         self.get_queryset()
         instance = self.get_object()
-        source = instance.source
-        source.on_delete = DeleteStatus.exists
-        source.save()
-        instance.delete()
+        RecyclebinServer.recover(instance)
         return Response({'success': "ok"})

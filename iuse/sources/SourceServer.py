@@ -1,6 +1,6 @@
 import os
 from iuse.settings import FILE_BASE_DIR, TEST_BASE_DIR
-from utils.modelshelpers.enums import FileType
+from utils.modelshelpers.enums import FileType, DeleteStatus
 from sources.models import Source
 
 
@@ -87,3 +87,31 @@ class SourceServer:
                 os.remove(path)
             except Exception:
                 pass
+
+    @classmethod
+    def set_on_delete(cls, source):
+        """
+        假删除
+        """
+        # 如果是文件，直接将 on_delete 属性置为 has_delete
+        source.on_delete = DeleteStatus.has_deleted
+        source.save()
+        # 如果是文件夹，需要递归将所有子文件 on_delete 属性置为 has_delete
+        if int(source.type) == FileType.DIR:
+            children = source.children
+            for child in children:
+                cls.set_on_delete(child)
+
+    @classmethod
+    def recover(cls, source):
+        """
+        从回收站中恢复
+        """
+        # 如果是文件，直接将 on_delete 属性置为 exists
+        source.on_delete = DeleteStatus.exists
+        source.save()
+        # 如果是文件夹，则需要递归将所有子文件 on_delete 属性置为 exists
+        if int(source.type) == FileType.DIR:
+            children = Source.objects.filter(parent_dir=source).all()
+            for child in children:
+                cls.recover(child)

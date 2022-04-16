@@ -119,8 +119,7 @@ class SourceViewSet(viewsets.GenericViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
         # 假删除，设置文件 on_delete = DeleteStatus.has_delete
         instance = serializer.validated_data['instance']
-        instance.on_delete = DeleteStatus.has_deleted
-        instance.save()
+        SourceServer.set_on_delete(instance)
         # 在回收站中创建一条删除记录
         Garbage.objects.create(
             source=instance,

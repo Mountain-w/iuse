@@ -35,8 +35,7 @@ class RecyclebinServer:
     @classmethod
     def recover(cls, garbage):
         source = garbage.source
-        source.on_delete = DeleteStatus.exists
-        source.save()
+        SourceServer.recover(source)
         garbage.delete()
 
     @classmethod

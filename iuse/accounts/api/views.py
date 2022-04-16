@@ -48,6 +48,7 @@ class AccountViewSet(viewsets.ViewSet):
             "success": True,
             "user": UserSerializer(instance=user).data,
             "token": generate_token(username),
+            "source_id": user.profile.source_path.id
         })
 
     @action(methods=["POST"], detail=False)
@@ -69,6 +70,7 @@ class AccountViewSet(viewsets.ViewSet):
             'success': True,
             'user': UserSerializer(user).data,
             'token': generate_token(user.username),
+            "source_id": user.profile.source_path.id
         },
             status=status.HTTP_201_CREATED)
 
