@@ -43,3 +43,12 @@ class RecyclebinServer:
         source = garbage.source
         SourceServer.delete(source)
         garbage.delete()
+
+    @classmethod
+    def check_repeat(cls, source):
+        garbages = [garbage for garbage in cls.get_query_set(source.owner)]
+        for garbage in garbages:
+            s = garbage.source
+            if s.name == source.name and int(s.type) == int(source.type):
+                cls.recycle(garbage)
+                break

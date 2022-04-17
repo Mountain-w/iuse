@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+
+from recyclebin.RecyclebinServer import RecyclebinServer
 from sources.models import Source
 from accounts.api.serializers import UserSerializer
 from rest_framework.exceptions import ValidationError
@@ -14,7 +16,7 @@ class SourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Source
-        fields = ('id', 'name', 'owner', 'update_at', 'type')
+        fields = ('id', 'name', 'owner', 'update_at', 'type', 'on_delete')
 
 
 class SourceWithChildrenSerializer(serializers.ModelSerializer):
@@ -52,6 +54,7 @@ class SourceCreateDirSerializer(serializers.ModelSerializer):
             name=name,
             type=FileType.DIR
         )
+        RecyclebinServer.check_repeat(source)
         SourceServer.create_sources(source)
         # SourceServer.create_sources_for_test(source)
         return source
@@ -65,7 +68,7 @@ class SourceDownloadSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
     def validate(self, data):
-        source = Source.objects.filter(name=data['name'], parent_dir_id=int(self.context['pk']))
+        source = Source.objects.filter(name=data['name'], parent_dir_id=int(self.context['pk'])).order_by('on_delete')
         if not source or int(source[0].on_delete) == DeleteStatus.has_deleted:
             raise ValidationError('File does not exist')
         data['path'] = SourceServer.generate_path(source[0])

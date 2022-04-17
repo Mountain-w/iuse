@@ -2,7 +2,7 @@
 from rest_framework import viewsets, status
 from django.http.response import StreamingHttpResponse
 
-
+from recyclebin.RecyclebinServer import RecyclebinServer
 from recyclebin.models import Garbage
 from sources.models import Source
 from rest_framework.permissions import IsAuthenticated
@@ -121,6 +121,7 @@ class SourceViewSet(viewsets.GenericViewSet):
         instance = serializer.validated_data['instance']
         SourceServer.set_on_delete(instance)
         # 在回收站中创建一条删除记录
+
         Garbage.objects.create(
             source=instance,
             owner=instance.owner

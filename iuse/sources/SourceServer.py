@@ -76,22 +76,49 @@ class SourceServer:
         return True
 
     @classmethod
-    def delete(cls, source):
+    def _delete(cls, source):
         """
-        真正的删除操作，接收一个资源，凭借出完整路径后删除文件系统中真正的文件。
+        真正的删除操作，接收一个资源，拼接出完整路径后删除文件系统中真正的文件。
         """
         path = os.path.join(FILE_BASE_DIR, cls.generate_path(source))
         if int(source.type) == FileType.FILE:
-            source.delete()
             try:
                 os.remove(path)
             except Exception:
                 pass
+        else:
+            try:
+                os.rmdir(path)
+            except Exception as e:
+                print(e)
+        source.delete()
+
+    @classmethod
+    def delete(cls, source):
+        """
+        宽度优先搜索
+        """
+        stack = list()
+        stack.append(source)
+        while stack:
+            cur = stack[-1]
+            children = Source.objects.filter(parent_dir=cur)
+            if children:
+                for child in children:
+                    if int(child.type) == FileType.FILE:
+                        cls._delete(child)
+                    else:
+                        stack.append(child)
+            else:
+                cls._delete(stack.pop())
+
+
 
     @classmethod
     def set_on_delete(cls, source):
         """
         假删除
+        宽度优先搜索
         """
         # 如果是文件，直接将 on_delete 属性置为 has_delete
         source.on_delete = DeleteStatus.has_deleted
