@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+
 from utils.modelshelpers.enums import FileType, DeleteStatus
+
 
 # Create your models here.\
 
@@ -22,6 +24,27 @@ class Source(models.Model):
     def children(self):
         return Source.objects.filter(parent_dir=self, on_delete=DeleteStatus.exists).all()
 
+    @property
+    def content(self):
+
+        con = Content.objects.filter(file=self)
+        # 如果不存在文本项，就生成
+        if not con:
+            path = SourceServer.generate_path(self)
+            # 读取文件的内容
+            with open(SourceServer.make_full_path(path), 'r') as f:
+                text = f.read()
+            con = Content.objects.create(
+                file=self,
+                content=text
+            )
+        else:
+            con = con[0]
+        return con
+
     def __str__(self):
         return f'owner:{self.owner}, {self.parent_dir.name}/{self.name}'
 
+
+from editor.models import Content
+from sources.SourceServer import SourceServer

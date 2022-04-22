@@ -20,11 +20,13 @@ from accounts.api.views import AccountViewSet
 from accounts.api.views import UserViewSet
 from sources.api.views import SourceViewSet
 from recyclebin.api.views import GarbageViewSet
+from editor.api.views import EditorViewSet
 router = routers.DefaultRouter()
 router.register(r'api/users', UserViewSet, basename='users')
 router.register(r'api/accounts', AccountViewSet, basename='accounts')
 router.register(r'api/sources', SourceViewSet, basename='sources')
 router.register(r'api/recyclebin', GarbageViewSet, basename='recyclebin')
+router.register(r'api/editor', EditorViewSet, basename='editor')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
